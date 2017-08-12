@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JWT Authentication Service", "JWT Authentication Service\JWT Authentication Service.csproj", "{770ECEA5-E397-4104-BA56-07AF45ACF962}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticatorTests", "AuthenticatorTests\AuthenticatorTests.csproj", "{A3101E55-2B62-4FD2-B231-71643E7B0812}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{770ECEA5-E397-4104-BA56-07AF45ACF962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{770ECEA5-E397-4104-BA56-07AF45ACF962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{770ECEA5-E397-4104-BA56-07AF45ACF962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{770ECEA5-E397-4104-BA56-07AF45ACF962}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3101E55-2B62-4FD2-B231-71643E7B0812}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3101E55-2B62-4FD2-B231-71643E7B0812}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3101E55-2B62-4FD2-B231-71643E7B0812}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3101E55-2B62-4FD2-B231-71643E7B0812}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
