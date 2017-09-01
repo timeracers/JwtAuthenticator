@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Package</id>
+    <version>1.0.0</version>
+    <authors>Tim Reinagel</authors>
+    <owners>Tim Reinagel</owners>
+    <projectUrl>https://github.com/timeracers/JwtAuthenticator</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This is a JWT library. Currently this can verify tokens, check expiration ("exp"), and can be used with any of these cryptography algorithms: HS256, HS382, HS512.</description>
+    <releaseNotes>Initial release with this name.</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <dependencies>
+      <dependency id="SampleDependency" version="1.0" />
+    </dependencies>
+  </metadata>
+</package>

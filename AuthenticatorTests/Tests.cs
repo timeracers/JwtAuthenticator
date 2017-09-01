@@ -3,8 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JwtAuthenticator;
 using System.Text;
 using Newtonsoft.Json.Linq;
-using System.Security.Cryptography;
+#if !Nuget
 using JwtAuthenticator.Special_JWT_Validators;
+#endif
 
 namespace AuthenticatorTests
 {
@@ -161,6 +162,7 @@ namespace AuthenticatorTests
             Assert.AreEqual(payload, result.Item2);
         }
 
+#if !Nuget
         [TestCategory("Validator")]
         [TestMethod]
         public void UserIdValidator_RejectAnonymous()
@@ -191,6 +193,7 @@ namespace AuthenticatorTests
 
             Assert.IsTrue(result);
         }
+#endif
 
         [TestCategory("Validator")]
         [TestMethod]

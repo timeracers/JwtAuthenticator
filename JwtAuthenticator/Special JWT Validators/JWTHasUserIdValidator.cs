@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿#if !Nuget
+using Newtonsoft.Json.Linq;
 
 namespace JwtAuthenticator.Special_JWT_Validators
 {
@@ -10,3 +11,4 @@ namespace JwtAuthenticator.Special_JWT_Validators
         }
     }
 }
+#endif
