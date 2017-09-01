@@ -7,11 +7,18 @@
     <owners>Tim Reinagel</owners>
     <projectUrl>https://github.com/timeracers/JwtAuthenticator</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>This is a JWT library. Currently this can verify tokens, check expiration ("exp"), and can be used with any of these cryptography algorithms: HS256, HS382, HS512.</description>
+    <description>This is a JWT library. Currently this can verify tokens, check expiration ("exp"), and can be used with any of these cryptography algorithms: HS256, HS382, HS512.
+    Dependency Newtonsoft.Json is included.</description>
     <releaseNotes>Initial release with this name.</releaseNotes>
     <copyright>Copyright 2017</copyright>
     <dependencies>
       <dependency id="SampleDependency" version="1.0" />
     </dependencies>
+    <files>
+	 <file src="JwtAuthenticator\bin\Nuget\JwtAuthenticator.dll" target="lib\net46" />
+	 <file src="JwtAuthenticator\bin\Nuget\JwtAuthenticator.pdb" target="lib\net46" />
+	 <file src="Lib\Newtonsoft.Json.dll" target="lib\net46" />
+	 <file src="Lib\Newtonsoft.Json.dll" target="lib\net46" />
+    </files>
   </metadata>
 </package>
