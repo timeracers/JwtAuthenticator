@@ -1,55 +1,63 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using JWT_Authentication_Service;
-using System.Web;
+using JwtAuthenticator;
 using System.Text;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using System.Security.Cryptography;
-using JWT_Authentication_Service.Special_JWT_Validators;
+using JwtAuthenticator.Special_JWT_Validators;
 
 namespace AuthenticatorTests
 {
     [TestClass]
     public class Tests
     {
+        private IEncryptor _encryptor;
+
+        [TestInitialize]
+        public void Initilize()
+        {
+            _encryptor = HmacShaEncryptor.CreateSha256("secret");
+        }
 
         [TestCategory("InvalidFormat")]
         [TestMethod]
         public void Authenticated_RejectTokensThatHaveMoreOrLessThen2Dots()
         {
-            AssertBadSignatureOrTokenWithoutPayload(new Authenticator("").Authenticate(CreateAcceptableJWTToken("") + "."));
-            AssertBadSignatureOrTokenWithoutPayload(new Authenticator("").Authenticate(CreateAcceptableJWTToken("").Replace(".", "")));
+            var notEnoughDots = new Authenticator(_encryptor).Authenticate(CreateAcceptableJWTToken(_encryptor) + ".");
+            var tooManyDots = new Authenticator(_encryptor).Authenticate(CreateAcceptableJWTToken(_encryptor).Replace(".", ""));
+
+            AssertInvalidToken(notEnoughDots);
+            AssertInvalidToken(tooManyDots);
         }
 
         [TestCategory("InvalidFormat")]
         [TestMethod]
         public void Authenticated_RejectTokensThatHaveInvalidBase64UrlCharactersInHeader()
         {
-            AssertBadSignatureOrTokenWithoutPayload(new Authenticator("").Authenticate("+/pp.."));
+            AssertInvalidToken(new Authenticator(_encryptor).Authenticate("+/pp.."));
         }
 
         [TestCategory("InvalidFormat")]
         [TestMethod]
         public void Authenticated_RejectTokensThatHaveInvalidBase64UrlCharactersInBody()
         {
-            AssertBadSignatureOrTokenWithoutPayload(new Authenticator("").Authenticate(".+/."));
+            AssertInvalidToken(new Authenticator(_encryptor).Authenticate(".+/."));
         }
 
         [TestCategory("InvalidFormat")]
         [TestMethod]
         public void Authenticated_RejectTokensThatHaveInvalidBase64UrlCharactersInSignature()
         {
-            AssertBadSignatureOrTokenWithoutPayload(new Authenticator("").Authenticate("../+"));
+            AssertInvalidToken(new Authenticator(_encryptor).Authenticate("../+"));
         }
 
         [TestCategory("InvalidFormat")]
         [TestMethod]
         public void Authenticated_RejectTokensWhichHeaderIsNotJson()
         {
-
             var invalidJson = "{]";
-            AssertBadSignatureOrTokenWithoutPayload(new Authenticator("").Authenticate(CreateJWTToken(invalidJson, CreateAcceptablePayload(), "")));
+            var result = new Authenticator(_encryptor).Authenticate(CreateJWTToken(invalidJson, CreateAcceptablePayload(), _encryptor));
+            AssertInvalidToken(result);
         }
 
 
@@ -58,7 +66,8 @@ namespace AuthenticatorTests
         public void Authenticated_RejectTokensWhichPayloadIsNotJson()
         {
             var invalidJson = "{]";
-            AssertBadSignatureOrTokenWithoutPayload(new Authenticator("").Authenticate(CreateJWTToken(CreateAcceptableHeader(), invalidJson, "")));
+            var result = new Authenticator(_encryptor).Authenticate(CreateJWTToken(CreateAcceptableHeader(_encryptor.Name), invalidJson, _encryptor));
+            AssertInvalidToken(result);
         }
 
         [TestCategory("UnacceptableJWT")]
@@ -67,7 +76,10 @@ namespace AuthenticatorTests
         {
             var header = new JObject();
             header["typ"] = "JWT";
-            AssertBadSignatureOrTokenWithPayload(new Authenticator("").Authenticate(CreateJWTToken(header, CreateAcceptablePayload(), "")));
+
+            var result = new Authenticator(_encryptor).Authenticate(CreateJWTToken(header, CreateAcceptablePayload(), _encryptor));
+
+            AssertMismatchedHeaders(result);
         }
 
         [TestCategory("UnacceptableJWT")]
@@ -77,7 +89,10 @@ namespace AuthenticatorTests
             var header = new JObject();
             header["alg"] = 256;
             header["typ"] = "JWT";
-            AssertBadSignatureOrTokenWithPayload(new Authenticator("").Authenticate(CreateJWTToken(header, CreateAcceptablePayload(), "")));
+
+            var result = new Authenticator(_encryptor).Authenticate(CreateJWTToken(header, CreateAcceptablePayload(), _encryptor));
+
+            AssertMismatchedHeaders(result);
         }
 
         [TestCategory("UnacceptableJWT")]
@@ -87,24 +102,33 @@ namespace AuthenticatorTests
             var header = new JObject();
             header["alg"] = "HS256";
             header["typ"] = "!JWT";
-            AssertBadSignatureOrTokenWithPayload(new Authenticator("").Authenticate(CreateJWTToken(header, CreateAcceptablePayload(), "")));
+
+            var result = new Authenticator(_encryptor).Authenticate(CreateJWTToken(header, CreateAcceptablePayload(), _encryptor));
+
+            AssertMismatchedHeaders(result);
         }
 
         [TestCategory("UnacceptableJWT")]
         [TestMethod]
-        public void Authenticated_RejectButHasPayloadForTokensWhichAreNotLabelledHS256()
+        public void Authenticated_RejectButHasPayloadForTokensWhichAreNotLabelledToUseTheSameEncryptionAlgorithm()
         {
+            var encryptor = HmacShaEncryptor.CreateSha512("secret");
             var header = new JObject();
-            header["alg"] = "RS256";
+            header["alg"] = "HS256";
             header["typ"] = "JWT";
-            AssertBadSignatureOrTokenWithPayload(new Authenticator("").Authenticate(CreateJWTToken(header, CreateAcceptablePayload(), "")));
+
+            var result = new Authenticator(encryptor).Authenticate(CreateJWTToken(header, CreateAcceptablePayload(), encryptor));
+
+            AssertMismatchedHeaders(result);
         }
 
         [TestCategory("UnacceptableJWT")]
         [TestMethod]
-        public void Authenticated_RejectTokensWithInvalidSignature()
+        public void Authenticated_RejectButHasPayloadForTokensWithInvalidSignature()
         {
-            AssertBadSignatureOrTokenWithoutPayload(new Authenticator("").Authenticate(CreateAcceptableJWTToken("differing secret")));
+            var differingEncryptor = HmacShaEncryptor.CreateSha512("secret");
+            var result = new Authenticator(_encryptor).Authenticate(CreateAcceptableJWTToken(differingEncryptor));
+            AssertBadSignature(result);
         }
 
         [TestCategory("ValidJWT")]
@@ -114,30 +138,34 @@ namespace AuthenticatorTests
             var payload = new JObject();
             payload["userId"] = "It's me a mario";
             payload["exp"] = DateTimeOffset.Now.AddDays(-1).ToUnixTimeSeconds();
-            AssertFailedClaims(new Authenticator("", new JWTRejectsValidator()).Authenticate(
-                CreateJWTToken(CreateAcceptableHeader(), payload, "")));
+            var authenticator = new Authenticator(_encryptor, new JWTRejectsValidator());
+
+            var result = authenticator.Authenticate(CreateJWTToken(CreateAcceptableHeader(_encryptor.Name), payload, _encryptor));
+
+            AssertFailedClaims(result);
         }
 
         [TestCategory("ValidJWT")]
         [TestMethod]
         public void Authenticated_AcceptValidTokensWhenAllValidatorsAcceptsPayload()
         {
-            AssertSuccess(new Authenticator("s", new JWTAcceptsValidator()).Authenticate(CreateAcceptableJWTToken("s")));
+            AssertSuccess(new Authenticator(_encryptor, new JWTAcceptsValidator()).Authenticate(CreateAcceptableJWTToken(_encryptor)));
         }
 
         [TestCategory("ValidJWT")]
         [TestMethod]
         public void Authenticated_HasSamePayload()
         {
-            var payload = new Authenticator("s").Authenticate(CreateAcceptableJWTToken("s")).Item2;
-            new JWTPayload(CreateAcceptablePayload()).Equals(payload);
+            var payload = new JWTPayload(CreateAcceptablePayload());
+            var result = new Authenticator(_encryptor).Authenticate(CreateAcceptableJWTToken(_encryptor));
+            Assert.AreEqual(payload, result.Item2);
         }
 
         [TestCategory("Validator")]
         [TestMethod]
         public void UserIdValidator_RejectAnonymous()
         {
-            Assert.IsFalse(new JWTHasUserIdValidator().Validate(new JWTPayload(new JObject())));
+            Assert.IsFalse(new JwtHasUserIdValidator().Validate(new JWTPayload(new JObject())));
         }
 
         [TestCategory("Validator")]
@@ -146,7 +174,10 @@ namespace AuthenticatorTests
         {
             var payload = new JObject();
             payload["userId"] = 4692483;
-            Assert.IsFalse(new JWTHasUserIdValidator().Validate(new JWTPayload(payload)));
+
+            var result = new JwtHasUserIdValidator().Validate(new JWTPayload(payload));
+
+            Assert.IsFalse(result);
         }
 
         [TestCategory("Validator")]
@@ -155,7 +186,10 @@ namespace AuthenticatorTests
         {
             var payload = new JObject();
             payload["userId"] = "it's me a mario";
-            Assert.IsTrue(new JWTHasUserIdValidator().Validate(new JWTPayload(payload)));
+
+            var result = new JwtHasUserIdValidator().Validate(new JWTPayload(payload));
+
+            Assert.IsTrue(result);
         }
 
         [TestCategory("Validator")]
@@ -164,7 +198,10 @@ namespace AuthenticatorTests
         {
             var payload = new JObject();
             payload["exp"] = DateTimeOffset.Now.AddDays(-1).ToUnixTimeSeconds();
-            Assert.IsFalse(new JWTExpiresValidator().Validate(new JWTPayload(payload)));
+
+            var result = new JWTExpiresValidator().Validate(new JWTPayload(payload));
+
+            Assert.IsFalse(result);
         }
 
         [TestCategory("Validator")]
@@ -173,7 +210,10 @@ namespace AuthenticatorTests
         {
             var payload = new JObject();
             payload["exp"] = DateTimeOffset.Now.AddDays(1).ToUnixTimeSeconds();
-            Assert.IsTrue(new JWTExpiresValidator().Validate(new JWTPayload(payload)));
+
+            var result = new JWTExpiresValidator().Validate(new JWTPayload(payload));
+
+            Assert.IsTrue(result);
         }
 
         [TestCategory("Validator")]
@@ -189,7 +229,10 @@ namespace AuthenticatorTests
         {
             var jobj = new JObject();
             jobj["something"] = "Gold Coin";
-            Assert.AreEqual(jobj, new JWTPayload(jobj).Base);
+
+            var isEqual = jobj.Equals(new JWTPayload(jobj).Base);
+
+            Assert.IsTrue(isEqual);
         }
 
         [TestCategory("Payload")]
@@ -198,77 +241,71 @@ namespace AuthenticatorTests
         {
             var jobj = new JObject();
             jobj["something"] = "Gold Coin";
-            Assert.AreEqual(jobj["something"].Value<string>(), new JWTPayload(jobj)["something"].Value<string>());
+
+            var result = new JWTPayload(jobj)["something"].Value<string>();
+
+            Assert.AreEqual(jobj["something"].Value<string>(), result);
         }
 
         [TestCategory("Payload")]
         [TestMethod]
-        public void Payload_RegularPropertiesReturnNoValueIfNotPresent()
-        {
-            var jobj = new JObject();
-            Assert.IsTrue(!new JWTPayload(jobj).Issuer.HasValue);
-        }
-
-        [TestCategory("Payload")]
-        [TestMethod]
-        public void Payload_RegularPropertiesReturnNoValueIfDifferingFormat()
-        {
-            var jobj = new JObject();
-            jobj["iss"] = 123;
-            Assert.IsTrue(!new JWTPayload(jobj).Issuer.HasValue);
-        }
-
-        [TestCategory("Payload")]
-        [TestMethod]
-        public void Payload_ElseRegularPropertiesReturnValue()
+        public void Payload_RegularPropertiesAreUnabbreviated()
         {
             var jobj = new JObject();
             jobj["iss"] = "johnDoeCorps";
-            Assert.IsTrue(new JWTPayload(jobj).Issuer.Value == "johnDoeCorps");
+
+            var result = new JWTPayload(jobj).Issuer.Value<string>();
+
+            Assert.AreEqual("johnDoeCorps", result);
         }
 
-        private void AssertBadSignatureOrTokenWithoutPayload(Tuple<Authentication, JWTPayload> actual)
+        private void AssertInvalidToken(Tuple<Token, JWTPayload> actual)
         {
-            AssertAuthenticateResult(Authentication.BadSignatureOrToken, false, actual);
+            AssertAuthenticateResult(Token.Invalid, false, actual);
         }
 
-        private void AssertBadSignatureOrTokenWithPayload(Tuple<Authentication, JWTPayload> actual)
+        private void AssertMismatchedHeaders(Tuple<Token, JWTPayload> actual)
         {
-            AssertAuthenticateResult(Authentication.BadSignatureOrToken, true, actual);
+            AssertAuthenticateResult(Token.MismatchedHeaders, true, actual);
         }
 
-        private void AssertFailedClaims(Tuple<Authentication, JWTPayload> actual)
+        private void AssertBadSignature(Tuple<Token, JWTPayload> actual)
         {
-            AssertAuthenticateResult(Authentication.FailedClaimsValidation, true, actual);
+            AssertAuthenticateResult(Token.BadSignature, true, actual);
         }
 
-        private void AssertSuccess(Tuple<Authentication, JWTPayload> actual)
+        private void AssertFailedClaims(Tuple<Token, JWTPayload> actual)
         {
-            AssertAuthenticateResult(Authentication.Authenticated, true, actual);
+            AssertAuthenticateResult(Token.BadClaims, true, actual);
         }
 
-        private void AssertAuthenticateResult(Authentication expectedResult, bool hasPayload, Tuple<Authentication, JWTPayload> actual)
+        private void AssertSuccess(Tuple<Token, JWTPayload> actual)
+        {
+            AssertAuthenticateResult(Token.Verified, true, actual);
+        }
+
+        private void AssertAuthenticateResult(Token expectedResult, bool hasPayload, Tuple<Token, JWTPayload> actual)
         {
             Assert.AreEqual(expectedResult, actual.Item1);
             Assert.AreEqual(hasPayload, (actual.Item2 != null));
         }
 
-        private string CreateAcceptableJWTToken(string secret)
+        private string CreateAcceptableJWTToken(IEncryptor encryptor)
         {
-            return CreateJWTToken(CreateAcceptableHeader(), CreateAcceptablePayload(), secret);
+            return CreateJWTToken(CreateAcceptableHeader(encryptor.Name), CreateAcceptablePayload(), encryptor);
         }
 
-        private string CreateJWTToken(object header, object payload, string secret)
+        private string CreateJWTToken(object header, object payload, IEncryptor encryptor)
         {
             var headerAndPayload = new Base64URLString(GetBytes(header.ToString())) + "."
                 + new Base64URLString(GetBytes(payload.ToString()));
-            return headerAndPayload + "." + new Base64URLString(new HMACSHA256(GetBytes(secret)).ComputeHash(GetBytes(headerAndPayload)));
+            return headerAndPayload + "." + new Base64URLString(encryptor.Encrypt(GetBytes(headerAndPayload)));
         }
 
-        private JObject CreateAcceptableHeader()
+        private JObject CreateAcceptableHeader(string algorithm)
         {
             var header = new JObject();
-            header["alg"] = "HS256";
+            header["alg"] = algorithm;
             header["typ"] = "JWT";
             return header;
         }

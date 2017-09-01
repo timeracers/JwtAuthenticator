@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A3101E55-2B62-4FD2-B231-71643E7B0812}</ProjectGuid>
+    <ProjectGuid>{2F37AF96-1178-41CD-8A1B-4FEE9A212506}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AuthenticatorTests</RootNamespace>
@@ -35,9 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\azure-activedirectory-identitymodel-extensions-for-dotnet-master\src\System.IdentityModel.Tokens.Jwt\bin\Release\net451\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
@@ -56,13 +55,13 @@
   <ItemGroup>
     <Compile Include="JWTAcceptsValidator.cs" />
     <Compile Include="JWTRejectsValidator.cs" />
-    <Compile Include="Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JWT Authentication Service\JWT Authentication Service.csproj">
-      <Project>{770ecea5-e397-4104-ba56-07af45acf962}</Project>
-      <Name>JWT Authentication Service</Name>
+    <ProjectReference Include="..\JwtAuthenticator\JwtAuthenticator.csproj">
+      <Project>{d0e9826b-9c4a-461e-8025-08e9ce024654}</Project>
+      <Name>JwtAuthenticator</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

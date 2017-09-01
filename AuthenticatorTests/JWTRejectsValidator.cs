@@ -1,4 +1,4 @@
-﻿using JWT_Authentication_Service;
+﻿using JwtAuthenticator;
 
 namespace AuthenticatorTests
 {

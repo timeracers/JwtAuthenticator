@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AuthenticatorTests")]
+[assembly: AssemblyTitle("JwtAuthenticator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("AuthenticatorTests")]
+[assembly: AssemblyProduct("JwtAuthenticator")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2f37af96-1178-41cd-8a1b-4fee9a212506")]
+[assembly: Guid("d0e9826b-9c4a-461e-8025-08e9ce024654")]
 
 // Version information for an assembly consists of the following four values:
 //
