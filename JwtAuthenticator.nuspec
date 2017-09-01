@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Package</id>
+    <id>timeracers.JwtAuthenticator</id>
     <version>1.0.0</version>
     <authors>Tim Reinagel</authors>
     <owners>Tim Reinagel</owners>
@@ -14,11 +14,11 @@
     <dependencies>
       <dependency id="SampleDependency" version="1.0" />
     </dependencies>
-    <files>
+  </metadata>
+  <files>
 	 <file src="JwtAuthenticator\bin\Nuget\JwtAuthenticator.dll" target="lib\net46" />
 	 <file src="JwtAuthenticator\bin\Nuget\JwtAuthenticator.pdb" target="lib\net46" />
 	 <file src="Lib\Newtonsoft.Json.dll" target="lib\net46" />
 	 <file src="Lib\Newtonsoft.Json.dll" target="lib\net46" />
     </files>
-  </metadata>
 </package>
