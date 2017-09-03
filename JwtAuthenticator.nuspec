@@ -2,17 +2,16 @@
 <package >
   <metadata>
     <id>timeracers.JwtAuthenticator</id>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
     <authors>Tim Reinagel</authors>
     <owners>Tim Reinagel</owners>
     <projectUrl>https://github.com/timeracers/JwtAuthenticator</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>This is a JWT library. Currently this can verify tokens, check expiration ("exp"), and can be used with any of these cryptography algorithms: HS256, HS382, HS512.
+    <description>This is a JWT library. Currently this can verify tokens, check expiration ("exp"), check not before ("nbf"), and can be used with any of these cryptography algorithms: HS256, HS382, HS512.
     Dependency Newtonsoft.Json is included.</description>
-    <releaseNotes>Initial release with this name.</releaseNotes>
+    <releaseNotes>Added not before validator, made the constructor by default includes expiration and not before validators.</releaseNotes>
     <copyright>Copyright 2017</copyright>
     <dependencies>
-      <dependency id="SampleDependency" version="1.0" />
     </dependencies>
   </metadata>
   <files>

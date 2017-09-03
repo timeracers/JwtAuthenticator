@@ -20,6 +20,26 @@ namespace JwtAuthenticator
             Base = payload;
         }
 
+        public bool Validate<T>(JTokenType type, string property, Predicate<T> condition)
+        {
+            return Validate(type, this[property], condition);
+        }
+
+        public bool Validate<T>(JTokenType type, JToken property, Predicate<T> condition)
+        {
+            return property != null && ValidateIfPresent(type, property, condition);
+        }
+
+        public bool ValidateIfPresent<T>(JTokenType type, string property, Predicate<T> condition)
+        {
+            return ValidateIfPresent(type, this[property], condition);
+        }
+
+        public bool ValidateIfPresent<T>(JTokenType type, JToken property, Predicate<T> condition)
+        {
+            return property == null || property.Type == type && condition(property.Value<T>());
+        }
+
         public override bool Equals(object obj)
         {
             return obj is JWTPayload && this.ToString().Equals(obj.ToString());
@@ -36,20 +56,32 @@ namespace JwtAuthenticator
         }
     }
 
-    public class JWTExpiresValidator : IJWTClaimValidator
+    public class JwtExpiresValidator : IJwtClaimValidator
     {
         public bool Validate(JWTPayload payload)
         {
-            return payload["exp"] == null ||
-                (payload.Expires.Type == JTokenType.Integer && payload.Expires.Value<long>() >= DateTimeOffset.Now.ToUnixTimeSeconds());
+            return payload.ValidateIfPresent<long>(JTokenType.Integer, "exp", (t) => t >= DateTimeOffset.Now.ToUnixTimeSeconds());
+        }
+    }
+
+    public class JwtNotBeforeValidator : IJwtClaimValidator
+    {
+        public bool Validate(JWTPayload payload)
+        {
+            return payload.ValidateIfPresent<long>(JTokenType.Integer, "nbf", (t) => DateTimeOffset.Now.ToUnixTimeSeconds() >= t);
         }
     }
 
     public static class ClaimValidator
     {
-        public static JWTExpiresValidator CreateExpiresValidator()
+        public static JwtExpiresValidator CreateExpiresValidator()
         {
-            return new JWTExpiresValidator();
+            return new JwtExpiresValidator();
+        }
+
+        public static JwtNotBeforeValidator CreateNotBeforeValidator()
+        {
+            return new JwtNotBeforeValidator();
         }
     }
 }

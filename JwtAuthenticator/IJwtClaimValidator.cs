@@ -1,6 +1,6 @@
 ﻿namespace JwtAuthenticator
 {
-    public interface IJWTClaimValidator
+    public interface IJwtClaimValidator
     {
         bool Validate(JWTPayload payload);
     }

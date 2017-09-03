@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -8,12 +9,21 @@ namespace JwtAuthenticator
     public class Authenticator
     {
         private IEncryptor _encrypter;
-        private IJWTClaimValidator[] _claimValidaters;
+        private List<IJwtClaimValidator> _claimValidaters;
 
-        public Authenticator(IEncryptor encrypter, params IJWTClaimValidator[] claimValidaters)
+        private Authenticator(IEncryptor encrypter, List<IJwtClaimValidator> claimValidaters)
         {
             _encrypter = encrypter;
-            _claimValidaters = claimValidaters;
+            _claimValidaters = new List<IJwtClaimValidator>(claimValidaters);
+        }
+
+        public Authenticator(IEncryptor encrypter, params IJwtClaimValidator[] claimValidaters)
+            : this(encrypter, new List<IJwtClaimValidator>(claimValidaters)
+                { ClaimValidator.CreateExpiresValidator(), ClaimValidator.CreateNotBeforeValidator() }) { }
+
+        public static Authenticator CreateCustom(IEncryptor encrypter, params IJwtClaimValidator[] claimValidaters)
+        {
+            return new Authenticator(encrypter, claimValidaters.ToList());;
         }
 
         public Tuple<Token, JWTPayload> Authenticate(string jwtString)
@@ -40,9 +50,15 @@ namespace JwtAuthenticator
                 return new Optional<Tuple<JObject, JWTPayload>>();
             try
             {
-                return new Optional<Tuple<JObject, JWTPayload>>(new Tuple<JObject, JWTPayload>(
-                    JObject.Parse(Encoding.UTF8.GetString(new Base64URLString(parts[0]).GetBytes())),
-                    new JWTPayload(JObject.Parse(Encoding.UTF8.GetString(new Base64URLString(parts[1]).GetBytes())))));
+                return new Optional<Tuple<JObject, JWTPayload>>(
+                    new Tuple<JObject, JWTPayload>(
+                        JObject.Parse(
+                            Encoding.UTF8.GetString(
+                                new Base64URLString(parts[0]).GetBytes())),
+                        new JWTPayload(
+                            JObject.Parse(
+                                Encoding.UTF8.GetString(
+                                    new Base64URLString(parts[1]).GetBytes())))));
             }
             catch
             {

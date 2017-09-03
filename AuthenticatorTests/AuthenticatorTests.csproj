@@ -61,8 +61,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="JWTAcceptsValidator.cs" />
-    <Compile Include="JWTRejectsValidator.cs" />
+    <Compile Include="JwtAcceptsValidator.cs" />
+    <Compile Include="JwtRejectsValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests.cs" />
   </ItemGroup>
