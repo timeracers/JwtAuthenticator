@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JwtAuthenticator;
 using System.Text;
 using Newtonsoft.Json.Linq;
-#if !Nuget
+#if !NUGET
 using JwtAuthenticator.SpecialJwtValidators;
 #endif
 
@@ -16,7 +16,7 @@ namespace AuthenticatorTests
         private Authenticator _authenticator;
 
         [TestInitialize]
-        public void Initilize()
+        public void Initialize()
         {
             _encryptor = HmacShaEncryptor.CreateSha256("secret");
             _authenticator = new Authenticator(_encryptor);
@@ -147,17 +147,17 @@ namespace AuthenticatorTests
         [TestMethod]
         public void Authenticated_HasSamePayload()
         {
-            var payload = new JWTPayload(CreateAcceptablePayload());
+            var payload = new JwtPayload(CreateAcceptablePayload());
             var result = Authenticate(CreateAcceptableJwtToken());
             Assert.AreEqual(payload, result.Item2);
         }
 
-#if !Nuget
+#if !NUGET
         [TestCategory("Validator")]
         [TestMethod]
         public void UserIdValidator_RejectAnonymous()
         {
-            Assert.IsFalse(new JwtHasUserIdValidator().Validate(new JWTPayload(new JObject())));
+            Assert.IsFalse(new JwtHasUserIdValidator().Validate(new JwtPayload(new JObject())));
         }
 
         [TestCategory("Validator")]
@@ -167,7 +167,7 @@ namespace AuthenticatorTests
             var payload = new JObject();
             payload["userId"] = 4692483;
 
-            var result = new JwtHasUserIdValidator().Validate(new JWTPayload(payload));
+            var result = new JwtHasUserIdValidator().Validate(new JwtPayload(payload));
 
             Assert.IsFalse(result);
         }
@@ -179,7 +179,7 @@ namespace AuthenticatorTests
             var payload = new JObject();
             payload["userId"] = "it's me a mario";
 
-            var result = new JwtHasUserIdValidator().Validate(new JWTPayload(payload));
+            var result = new JwtHasUserIdValidator().Validate(new JwtPayload(payload));
 
             Assert.IsTrue(result);
         }
@@ -192,7 +192,7 @@ namespace AuthenticatorTests
             var payload = new JObject();
             payload["exp"] = DateTimeOffset.Now.AddDays(-1).ToUnixTimeSeconds();
 
-            var result = new JwtExpiresValidator().Validate(new JWTPayload(payload));
+            var result = new JwtExpiresValidator().Validate(new JwtPayload(payload));
 
             Assert.IsFalse(result);
         }
@@ -204,7 +204,7 @@ namespace AuthenticatorTests
             var payload = new JObject();
             payload["exp"] = DateTimeOffset.Now.AddDays(1).ToUnixTimeSeconds();
 
-            var result = new JwtExpiresValidator().Validate(new JWTPayload(payload));
+            var result = new JwtExpiresValidator().Validate(new JwtPayload(payload));
 
             Assert.IsTrue(result);
         }
@@ -213,7 +213,7 @@ namespace AuthenticatorTests
         [TestMethod]
         public void ExpiresValidator_AcceptsNeverExpiringToken()
         {
-            Assert.IsTrue(new JwtExpiresValidator().Validate(new JWTPayload(new JObject())));
+            Assert.IsTrue(new JwtExpiresValidator().Validate(new JwtPayload(new JObject())));
         }
 
         [TestCategory("Validator")]
@@ -223,7 +223,7 @@ namespace AuthenticatorTests
             var payload = new JObject();
             payload["nbf"] = DateTimeOffset.Now.AddDays(1).ToUnixTimeSeconds();
 
-            var result = new JwtNotBeforeValidator().Validate(new JWTPayload(payload));
+            var result = new JwtNotBeforeValidator().Validate(new JwtPayload(payload));
 
             Assert.IsFalse(result);
         }
@@ -235,7 +235,7 @@ namespace AuthenticatorTests
             var payload = new JObject();
             payload["nbf"] = DateTimeOffset.Now.AddDays(-1).ToUnixTimeSeconds();
 
-            var result = new JwtNotBeforeValidator().Validate(new JWTPayload(payload));
+            var result = new JwtNotBeforeValidator().Validate(new JwtPayload(payload));
 
             Assert.IsTrue(result);
         }
@@ -244,7 +244,7 @@ namespace AuthenticatorTests
         [TestMethod]
         public void NotBeforeValidator_AcceptsNeverExpiringToken()
         {
-            Assert.IsTrue(new JwtNotBeforeValidator().Validate(new JWTPayload(new JObject())));
+            Assert.IsTrue(new JwtNotBeforeValidator().Validate(new JwtPayload(new JObject())));
         }
 
         [TestCategory("Payload")]
@@ -254,7 +254,7 @@ namespace AuthenticatorTests
             var jobj = new JObject();
             jobj["something"] = "Gold Coin";
 
-            var isEqual = jobj.Equals(new JWTPayload(jobj).Base);
+            var isEqual = jobj.Equals(new JwtPayload(jobj).Base);
 
             Assert.IsTrue(isEqual);
         }
@@ -266,7 +266,7 @@ namespace AuthenticatorTests
             var jobj = new JObject();
             jobj["something"] = "Gold Coin";
 
-            var result = new JWTPayload(jobj)["something"].Value<string>();
+            var result = new JwtPayload(jobj)["something"].Value<string>();
 
             Assert.AreEqual(jobj["something"].Value<string>(), result);
         }
@@ -278,12 +278,12 @@ namespace AuthenticatorTests
             var jobj = new JObject();
             jobj["iss"] = "johnDoeCorps";
 
-            var result = new JWTPayload(jobj).Issuer.Value<string>();
+            var result = new JwtPayload(jobj).Issuer.Value<string>();
 
             Assert.AreEqual("johnDoeCorps", result);
         }
 
-        private Tuple<Token, JWTPayload> Authenticate(string token)
+        private Tuple<Token, JwtPayload> Authenticate(string token)
         {
             return _authenticator.Authenticate(token);
         }
@@ -293,27 +293,27 @@ namespace AuthenticatorTests
             AssertAuthenticateResult(Token.Invalid, false, Authenticate(token));
         }
 
-        private void AssertMismatchedHeaders(Tuple<Token, JWTPayload> actual)
+        private void AssertMismatchedHeaders(Tuple<Token, JwtPayload> actual)
         {
             AssertAuthenticateResult(Token.MismatchedHeaders, true, actual);
         }
 
-        private void AssertBadSignature(Tuple<Token, JWTPayload> actual)
+        private void AssertBadSignature(Tuple<Token, JwtPayload> actual)
         {
             AssertAuthenticateResult(Token.BadSignature, true, actual);
         }
 
-        private void AssertFailedClaims(Tuple<Token, JWTPayload> actual)
+        private void AssertFailedClaims(Tuple<Token, JwtPayload> actual)
         {
             AssertAuthenticateResult(Token.BadClaims, true, actual);
         }
 
-        private void AssertSuccess(Tuple<Token, JWTPayload> actual)
+        private void AssertSuccess(Tuple<Token, JwtPayload> actual)
         {
             AssertAuthenticateResult(Token.Verified, true, actual);
         }
 
-        private void AssertAuthenticateResult(Token expectedResult, bool hasPayload, Tuple<Token, JWTPayload> actual)
+        private void AssertAuthenticateResult(Token expectedResult, bool hasPayload, Tuple<Token, JwtPayload> actual)
         {
             Assert.AreEqual(expectedResult, actual.Item1);
             Assert.AreEqual(hasPayload, (actual.Item2 != null));

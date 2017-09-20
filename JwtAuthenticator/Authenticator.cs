@@ -26,43 +26,43 @@ namespace JwtAuthenticator
             return new Authenticator(encrypter, claimValidaters.ToList());;
         }
 
-        public Tuple<Token, JWTPayload> Authenticate(string jwtString)
+        public Tuple<Token, JwtPayload> Authenticate(string jwtString)
         {
-            Optional<Tuple<JObject, JWTPayload>> jwtHeaderAndPayload = TryConvertString(jwtString);
+            Optional<Tuple<JObject, JwtPayload>> jwtHeaderAndPayload = TryConvertString(jwtString);
             if(!jwtHeaderAndPayload.HasValue)
-                return new Tuple<Token, JWTPayload>(Token.Invalid, null);
+                return new Tuple<Token, JwtPayload>(Token.Invalid, null);
             var header = jwtHeaderAndPayload.Value.Item1;
             var payload = jwtHeaderAndPayload.Value.Item2;
 
             if (!VerifySignature(jwtString.Split('.')))
-                return new Tuple<Token, JWTPayload>(Token.BadSignature, payload);
+                return new Tuple<Token, JwtPayload>(Token.BadSignature, payload);
             if (!ValidateHeaders(header))
-                return new Tuple<Token, JWTPayload>(Token.MismatchedHeaders, payload);
+                return new Tuple<Token, JwtPayload>(Token.MismatchedHeaders, payload);
             if (!ValidatePayload(payload))
-                return new Tuple<Token, JWTPayload>(Token.BadClaims, payload);
-            return new Tuple<Token, JWTPayload>(Token.Verified, payload);
+                return new Tuple<Token, JwtPayload>(Token.BadClaims, payload);
+            return new Tuple<Token, JwtPayload>(Token.Verified, payload);
         }
 
-        private Optional<Tuple<JObject, JWTPayload>> TryConvertString(string jwtString)
+        private Optional<Tuple<JObject, JwtPayload>> TryConvertString(string jwtString)
         {
             var parts = jwtString.Split('.');
             if (parts.Length != 3)
-                return new Optional<Tuple<JObject, JWTPayload>>();
+                return new Optional<Tuple<JObject, JwtPayload>>();
             try
             {
-                return new Optional<Tuple<JObject, JWTPayload>>(
-                    new Tuple<JObject, JWTPayload>(
+                return new Optional<Tuple<JObject, JwtPayload>>(
+                    new Tuple<JObject, JwtPayload>(
                         JObject.Parse(
                             Encoding.UTF8.GetString(
                                 new Base64URLString(parts[0]).GetBytes())),
-                        new JWTPayload(
+                        new JwtPayload(
                             JObject.Parse(
                                 Encoding.UTF8.GetString(
                                     new Base64URLString(parts[1]).GetBytes())))));
             }
             catch
             {
-                return new Optional<Tuple<JObject, JWTPayload>>();
+                return new Optional<Tuple<JObject, JwtPayload>>();
             }
         }
 
@@ -77,7 +77,7 @@ namespace JwtAuthenticator
                 && header["typ"] != null && header["typ"].Type == JTokenType.String && header["typ"].Value<string>() == "JWT";
         }
 
-        private bool ValidatePayload(JWTPayload payload)
+        private bool ValidatePayload(JwtPayload payload)
         {
             return _claimValidaters.All((v) => v.Validate(payload));
         }

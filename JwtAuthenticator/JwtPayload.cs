@@ -3,7 +3,7 @@ using System;
 
 namespace JwtAuthenticator
 {
-    public class JWTPayload
+    public class JwtPayload
     {
         public JObject Base { get; private set; }
         public JToken this[string propertyName] { get { return Base[propertyName]; }}
@@ -15,7 +15,7 @@ namespace JwtAuthenticator
         public JToken Issuer { get { return this["iss"]; } }
         public JToken Issued { get { return this["iat"]; } }
 
-        public JWTPayload(JObject payload)
+        public JwtPayload(JObject payload)
         {
             Base = payload;
         }
@@ -42,7 +42,7 @@ namespace JwtAuthenticator
 
         public override bool Equals(object obj)
         {
-            return obj is JWTPayload && this.ToString().Equals(obj.ToString());
+            return obj is JwtPayload && this.ToString().Equals(obj.ToString());
         }
 
         public override int GetHashCode()
@@ -58,7 +58,7 @@ namespace JwtAuthenticator
 
     public class JwtExpiresValidator : IJwtClaimValidator
     {
-        public bool Validate(JWTPayload payload)
+        public bool Validate(JwtPayload payload)
         {
             return payload.ValidateIfPresent<long>(JTokenType.Integer, "exp", (t) => t >= DateTimeOffset.Now.ToUnixTimeSeconds());
         }
@@ -66,7 +66,7 @@ namespace JwtAuthenticator
 
     public class JwtNotBeforeValidator : IJwtClaimValidator
     {
-        public bool Validate(JWTPayload payload)
+        public bool Validate(JwtPayload payload)
         {
             return payload.ValidateIfPresent<long>(JTokenType.Integer, "nbf", (t) => DateTimeOffset.Now.ToUnixTimeSeconds() >= t);
         }

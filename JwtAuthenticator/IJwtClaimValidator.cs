@@ -2,6 +2,6 @@
 {
     public interface IJwtClaimValidator
     {
-        bool Validate(JWTPayload payload);
+        bool Validate(JwtPayload payload);
     }
 }

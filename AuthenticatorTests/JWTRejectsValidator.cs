@@ -4,7 +4,7 @@ namespace AuthenticatorTests
 {
     public class JwtRejectsValidator : IJwtClaimValidator
     {
-        public bool Validate(JWTPayload payload)
+        public bool Validate(JwtPayload payload)
         {
             return false;
         }
