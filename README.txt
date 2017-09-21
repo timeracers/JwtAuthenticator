@@ -1,4 +1,4 @@
-# JwtAuthenticator
+    JwtAuthenticator
 To create an authenticator use
   new Authenticator(IEncryptor encryptor, params IJwtClaimValidator[] claimValidaters)
 For the encryptor you can either use HmacEncryptor's methods or create your own IEncryptor.
