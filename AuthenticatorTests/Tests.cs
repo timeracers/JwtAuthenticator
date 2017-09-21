@@ -18,7 +18,7 @@ namespace AuthenticatorTests
         [TestInitialize]
         public void Initialize()
         {
-            _encryptor = HmacShaEncryptor.CreateSha256("secret");
+            _encryptor = HmacEncryptor.CreateSha256("secret");
             _authenticator = new Authenticator(_encryptor);
         }
 
@@ -110,7 +110,7 @@ namespace AuthenticatorTests
         [TestMethod]
         public void Authenticated_RejectButHasPayloadForTokensWhichAreNotLabelledToUseTheSameEncryptionAlgorithm()
         {
-            var encryptor = HmacShaEncryptor.CreateSha512("secret");
+            var encryptor = HmacEncryptor.CreateSha512("secret");
             var header = new JObject();
             header["alg"] = "HS256";
             header["typ"] = "JWT";
@@ -124,7 +124,7 @@ namespace AuthenticatorTests
         [TestMethod]
         public void Authenticated_RejectButHasPayloadForTokensWithInvalidSignature()
         {
-            var differingEncryptor = HmacShaEncryptor.CreateSha512("secret");
+            var differingEncryptor = HmacEncryptor.CreateSha512("secret");
             var result = new Authenticator(_encryptor).Authenticate(CreateAcceptableJwtToken(differingEncryptor));
             AssertBadSignature(result);
         }
@@ -242,7 +242,7 @@ namespace AuthenticatorTests
 
         [TestCategory("Validator")]
         [TestMethod]
-        public void NotBeforeValidator_AcceptsNeverExpiringToken()
+        public void NotBeforeValidator_AcceptsTokensWithoutNotBeforeProperty()
         {
             Assert.IsTrue(new JwtNotBeforeValidator().Validate(new JwtPayload(new JObject())));
         }
@@ -290,33 +290,33 @@ namespace AuthenticatorTests
 
         private void AssertInvalidToken(string token)
         {
-            AssertAuthenticateResult(Token.Invalid, false, Authenticate(token));
+            AssertAuthenticationResult(Token.Invalid, false, Authenticate(token));
         }
 
         private void AssertMismatchedHeaders(Tuple<Token, JwtPayload> actual)
         {
-            AssertAuthenticateResult(Token.MismatchedHeaders, true, actual);
+            AssertAuthenticationResult(Token.MismatchedHeaders, true, actual);
         }
 
         private void AssertBadSignature(Tuple<Token, JwtPayload> actual)
         {
-            AssertAuthenticateResult(Token.BadSignature, true, actual);
+            AssertAuthenticationResult(Token.BadSignature, true, actual);
         }
 
         private void AssertFailedClaims(Tuple<Token, JwtPayload> actual)
         {
-            AssertAuthenticateResult(Token.BadClaims, true, actual);
+            AssertAuthenticationResult(Token.BadClaims, true, actual);
         }
 
         private void AssertSuccess(Tuple<Token, JwtPayload> actual)
         {
-            AssertAuthenticateResult(Token.Verified, true, actual);
+            AssertAuthenticationResult(Token.Verified, true, actual);
         }
 
-        private void AssertAuthenticateResult(Token expectedResult, bool hasPayload, Tuple<Token, JwtPayload> actual)
+        private void AssertAuthenticationResult(Token expectedResult, bool hasPayload, Tuple<Token, JwtPayload> actual)
         {
             Assert.AreEqual(expectedResult, actual.Item1);
-            Assert.AreEqual(hasPayload, (actual.Item2 != null));
+            Assert.AreEqual(hasPayload, actual.Item2 != null);
         }
 
         private string CreateAcceptableJwtToken()
@@ -351,8 +351,7 @@ namespace AuthenticatorTests
 
         private JObject CreateAcceptablePayload()
         {
-            var payload = new JObject();
-            return payload;
+            return new JObject();
         }
 
         private byte[] GetBytes(string secret)

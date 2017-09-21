@@ -8,22 +8,22 @@ namespace JwtAuthenticator
 {
     public class Authenticator
     {
-        private IEncryptor _encrypter;
+        private IEncryptor _encryptor;
         private List<IJwtClaimValidator> _claimValidaters;
 
-        private Authenticator(IEncryptor encrypter, List<IJwtClaimValidator> claimValidaters)
+        private Authenticator(IEncryptor encryptor, List<IJwtClaimValidator> claimValidaters)
         {
-            _encrypter = encrypter;
+            _encryptor = encryptor;
             _claimValidaters = new List<IJwtClaimValidator>(claimValidaters);
         }
 
-        public Authenticator(IEncryptor encrypter, params IJwtClaimValidator[] claimValidaters)
-            : this(encrypter, new List<IJwtClaimValidator>(claimValidaters)
+        public Authenticator(IEncryptor encryptor, params IJwtClaimValidator[] claimValidaters)
+            : this(encryptor, new List<IJwtClaimValidator>(claimValidaters)
                 { ClaimValidator.CreateExpiresValidator(), ClaimValidator.CreateNotBeforeValidator() }) { }
 
-        public static Authenticator CreateCustom(IEncryptor encrypter, params IJwtClaimValidator[] claimValidaters)
+        public static Authenticator CreateCustom(IEncryptor encryptor, params IJwtClaimValidator[] claimValidaters)
         {
-            return new Authenticator(encrypter, claimValidaters.ToList());;
+            return new Authenticator(encryptor, claimValidaters.ToList());;
         }
 
         public Tuple<Token, JwtPayload> Authenticate(string jwtString)
@@ -68,12 +68,12 @@ namespace JwtAuthenticator
 
         private bool VerifySignature(string[] parts)
         {
-            return parts[2] == new Base64URLString(_encrypter.Encrypt(Encoding.UTF8.GetBytes(parts[0] + "." + parts[1])));
+            return parts[2] == new Base64URLString(_encryptor.Encrypt(Encoding.UTF8.GetBytes(parts[0] + "." + parts[1])));
         }
 
         private bool ValidateHeaders(JObject header)
         {
-            return header["alg"] != null && header["alg"].Type == JTokenType.String && header["alg"].Value<string>() == _encrypter.Name
+            return header["alg"] != null && header["alg"].Type == JTokenType.String && header["alg"].Value<string>() == _encryptor.Name
                 && header["typ"] != null && header["typ"].Type == JTokenType.String && header["typ"].Value<string>() == "JWT";
         }
 
