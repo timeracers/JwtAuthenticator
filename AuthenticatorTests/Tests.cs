@@ -3,6 +3,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JwtAuthenticator;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
+using Newtonsoft.Json;
 #if !NUGET
 using JwtAuthenticator.SpecialJwtValidators;
 #endif
@@ -245,6 +247,25 @@ namespace AuthenticatorTests
         public void NotBeforeValidator_AcceptsTokensWithoutNotBeforeProperty()
         {
             Assert.IsTrue(new JwtNotBeforeValidator().Validate(new JwtPayload(new JObject())));
+        }
+
+        [TestCategory("Validator")]
+        [TestMethod]
+        public void SubjectValidator_AcceptsTokensWithSubjectProperty()
+        {
+            var payload = new JObject();
+            payload["sub"] = Guid.Empty.ToString();
+
+            var result = new JwtSubjectValidator().Validate(new JwtPayload(payload));
+
+            Assert.IsTrue(result);
+        }
+
+        [TestCategory("Validator")]
+        [TestMethod]
+        public void SubjectValidator_RejectsTokensWithoutSubjectProperty()
+        {
+            Assert.IsFalse(new JwtSubjectValidator().Validate(new JwtPayload(new JObject())));
         }
 
         [TestCategory("Payload")]

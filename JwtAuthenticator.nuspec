@@ -2,16 +2,19 @@
 <package >
   <metadata>
     <id>timeracers.JwtAuthenticator</id>
-    <version>2.0.0</version>
+    <title>JwtAuthenticator</title>
+    <version>2.1.0</version>
     <authors>Tim Reinagel</authors>
     <owners>Tim Reinagel</owners>
     <projectUrl>https://github.com/timeracers/JwtAuthenticator</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>This is a JWT library. Currently this can verify tokens, check expiration ("exp"), check not before ("nbf"), and can be used with any of these cryptography algorithms: HS256, HS382, HS512. Uses Semantic Versioning starting from 1.1.0</description>
-    <releaseNotes>Renamed HmacShaEncrypter to HmacEncryptor.</releaseNotes>
+    <description>This is a JWT library. Currently this can verify tokens, check expiration ("exp"), check not before ("nbf"), check subject ("sub"), and can be used with any of these cryptography algorithms: HS256, HS382, HS512. Uses Semantic Versioning starting from 1.1.0</description>
+    <releaseNotes>Added subject claim validator.</releaseNotes>
+    <summary>This is a Json Web Token library. Currently this can verify tokens, check expiration, check not before, check subject, and can be used with any of these cryptography algorithms: HS256, HS382, HS512.</summary>
     <copyright>Copyright 2017</copyright>
+    <tags>JWT</tags>
     <dependencies>
-	<dependency id="Newtonsoft.Json" version="10.0.3" />
+	    <dependency id="Newtonsoft.Json" version="10.0.3" />
     </dependencies>
   </metadata>
   <files>
@@ -19,5 +22,5 @@
 	 <file src="JwtAuthenticator\bin\Nuget\net46\JwtAuthenticator.pdb" target="lib\net46" />
 	 <file src="JwtAuthenticator\bin\Nuget\netcoreapp1.1\JwtAuthenticator.dll" target="lib\netcoreapp1.1" />
 	 <file src="JwtAuthenticator\bin\Nuget\netcoreapp1.1\JwtAuthenticator.pdb" target="lib\netcoreapp1.1" />
-    </files>
+  </files>
 </package>

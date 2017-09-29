@@ -3,9 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtAuthenticator", "JwtAuthenticator\JwtAuthenticator.csproj", "{3ED05B20-E376-4296-B6C5-53A3E866ED35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtAuthenticator", "JwtAuthenticator\JwtAuthenticator.csproj", "{3ED05B20-E376-4296-B6C5-53A3E866ED35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticatorTests", "AuthenticatorTests\AuthenticatorTests.csproj", "{07EEEEB5-27D3-4C55-979E-DED4C52B835A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthenticatorTests", "AuthenticatorTests\AuthenticatorTests.csproj", "{07EEEEB5-27D3-4C55-979E-DED4C52B835A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A48811BE-6B2A-4535-B86A-D8A3E4C79900}"
+	ProjectSection(SolutionItems) = preProject
+		JwtAuthenticator.nuspec = JwtAuthenticator.nuspec
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

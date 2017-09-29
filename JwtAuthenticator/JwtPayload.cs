@@ -72,6 +72,14 @@ namespace JwtAuthenticator
         }
     }
 
+    public class JwtSubjectValidator : IJwtClaimValidator
+    {
+        public bool Validate(JwtPayload payload)
+        {
+            return payload.Validate<string>(JTokenType.String, "sub", (_) => true);
+        }
+    }
+
     public static class ClaimValidator
     {
         public static JwtExpiresValidator CreateExpiresValidator()
@@ -82,6 +90,11 @@ namespace JwtAuthenticator
         public static JwtNotBeforeValidator CreateNotBeforeValidator()
         {
             return new JwtNotBeforeValidator();
+        }
+
+        public static JwtSubjectValidator CreateSubjectValidator(JTokenType type)
+        {
+            return new JwtSubjectValidator();
         }
     }
 }
