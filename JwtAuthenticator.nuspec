@@ -3,7 +3,7 @@
   <metadata>
     <id>timeracers.JwtAuthenticator</id>
     <title>JwtAuthenticator</title>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
     <authors>Tim Reinagel</authors>
     <owners>Tim Reinagel</owners>
     <projectUrl>https://github.com/timeracers/JwtAuthenticator</projectUrl>

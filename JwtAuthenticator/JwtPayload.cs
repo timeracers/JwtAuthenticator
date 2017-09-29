@@ -92,6 +92,12 @@ namespace JwtAuthenticator
             return new JwtNotBeforeValidator();
         }
 
+        public static JwtSubjectValidator CreateSubjectValidator()
+        {
+            return new JwtSubjectValidator();
+        }
+
+        [System.Obsolete("The JTokenType is unused parameter is unused, use the parameterless one instead")]
         public static JwtSubjectValidator CreateSubjectValidator(JTokenType type)
         {
             return new JwtSubjectValidator();
