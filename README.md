@@ -7,7 +7,7 @@ To create an authenticator use
 ```c#
 new Authenticator(IEncryptor encryptor, params IJwtClaimValidator[] claimValidaters)
 ```
-For the encryptor you can either create a HmacEncryptor or create your own IEncryptor.
+For the encryptor you can either create a HmacEncryptor or create your own encryptor that fulfills
 ```c#
 public interface IEncryptor
 {
@@ -16,7 +16,7 @@ public interface IEncryptor
 }
 ```
 For claim validation, you don't need to do anything if you just want to check expiration and not before.
-Otherwise add IJwtClaimValidators.
+To add extra claim validators they need to implement
 ```c#
 public interface IJwtClaimValidator
 {
@@ -24,9 +24,8 @@ public interface IJwtClaimValidator
 }
 ```
 
-To verify a token use Authenticator's
+To verify a token use Authenticator's authenticate method and confirm that the Token is equal to Token.Verified.
 ```c#
 public Tuple<Token, JwtPayload> Authenticate(string jwtString)
 ```
-and check that Token is equal to Token.Verified.  
-Note: The JwtPayload will be null if the jwtString was misformed which is indicated by the Token enum being Invalid.
+Note: The JwtPayload will be null if the jwtString was misformed which is indicated by the Token being Token.Invalid.
