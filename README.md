@@ -21,25 +21,6 @@ if (authenticated.Item1 == Token.Verified)
 else
     Console.WriteLine("You are unauthorized.");
 ```
-```c#
-public void YourAuthenticate(string jwt) {
-	var auth = new AuthenticationWrapper(HmacEncryptor.CreateSha256("strings are easier to create then byte arrays"), new JwtSubjectValidator());
-    var authenticated = auth.Authenticate(jwt);
-    //You can check the result like this
-    //authenticated.Item1 == Token.Verified
-}
-```
-
-```c#
-String validJwtWithUserX = ...;
-var auth = new AuthenticationWrapper(HmacEncryptor.CreateSha256("strings are easier to create then byte arrays"),
-    new JwtSubjectValidator());
-var authenticated = auth.Authenticate(jwt);
-if (authenticated.Item1 == Token.Verified)
-    Console.WriteLine("Welcome " + authenticated.Item2.Subject.ToObject<string>());
-else
-    Console.WriteLine("You are unauthorized.");
-```
 
 To see a project that uses it view my [Alert Center](https://github.com/timeracers/AlertCenter) project.
 
