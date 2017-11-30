@@ -2,17 +2,14 @@
 ### A C# Json Web Token Authentication Library
 [Nuget: timeracers.JwtAuthenticator](https://www.nuget.org/packages/timeracers.JwtAuthenticator)
 
-Have you ever seen a "Login with GitHub" button? Obviously they couldn't have simply passed the login credentials. That is where Json Web Tokens come into play. To make a valid JWT you need to know the server's secret. By sharing the secret with only some services, you allow those JWT distributors to create them while preventing random users from creating them. This library can validate a token, extract the payload from a token, check if a token is expired, and even allows custom claim validation.
+[![NuGet](https://img.shields.io/nuget/v/timeracers.JwtAuthenticator.svg?style=plastic)]()
 
-### Sections
-* [Examples](#examples)
-* [Usage](#usage)
-* [Building and Testing](#building-and-testing)
+Have you ever seen a "Login with GitHub" button? Obviously they couldn't have simply passed the login credentials. That is where Json Web Tokens come into play. To make a valid JWT you need to know the server's secret. By sharing the secret with only some services, you allow those JWT distributors to create them while preventing random users from creating them. This library can validate a token, extract the payload from a token, check if a token is expired, and even allows custom claim validation.
 
 ### Examples
 This example will either greet you or state that you aren't authorized based upon the JWT.
 ```c#
-String jwt = ...;
+var jwt = "InsertJwtHere";
 var auth = new AuthenticationWrapper(HmacEncryptor.CreateSha256("strings are easier to create then byte arrays"),
     new JwtSubjectValidator());
 var authenticated = auth.Authenticate(jwt);
@@ -51,11 +48,3 @@ To verify a token use Authenticator's authenticate method and confirm that the T
 public Tuple<Token, JwtPayload> Authenticate(string jwtString)
 ```
 Note: The JwtPayload will be null if the jwtString was misformed which is indicated by the Token being Token.Invalid.
-
-### Building and Testing
-If you don't have visual studio 2017 and don't want to download the whole thing then you can use just the devs tools with your preferred shell, examples are for command prompt with the active directory being the project folder.
-```console
-MSBuild /t:Restore
-MSBuild /p:Configuration=Release "/p:Platform=Any CPU"
-MSTest /testcontainer:AuthenticatorTests\bin\Release\AuthenticatorTests.dll
-```
