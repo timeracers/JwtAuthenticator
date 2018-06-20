@@ -10,7 +10,7 @@ Have you ever seen a "Login with GitHub" button? Obviously they couldn't have si
 This example will either greet you or state that you aren't authorized based upon the JWT.
 ```c#
 var jwt = "InsertJwtHere";
-var auth = new AuthenticationWrapper(HmacEncryptor.CreateSha256("strings are easier to create then byte arrays"),
+var auth = new Authenticator(HmacEncryptor.CreateSha256("strings are easier to create then byte arrays"),
     new JwtSubjectValidator());
 var authenticated = auth.Authenticate(jwt);
 if (authenticated.Item1 == Token.Verified)
